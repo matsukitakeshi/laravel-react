@@ -14,10 +14,6 @@ ENV TZ=UTC \
 
 COPY --from=composer:2.4 /usr/bin/composer /usr/bin/composer
 
-# Node.jsをインストール
-RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
-RUN apt-get install -y nodejs
-
 RUN apt-get update \
   && apt-get -y install --no-install-recommends \
     locales \
@@ -26,6 +22,8 @@ RUN apt-get update \
     libzip-dev \
     libicu-dev \
     libonig-dev \
+    nodejs \
+    npm \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
   && locale-gen en_US.UTF-8 \
@@ -57,4 +55,6 @@ COPY ./src /workspace
 RUN composer install -q -n --no-ansi --no-dev --no-scripts --no-progress --prefer-dist \
   && chmod -R 777 storage bootstrap/cache \
   && php artisan optimize:clear \
-  && php artisan optimize
+  && php artisan optimize \
+  && npm install \
+  && npm run dev \
